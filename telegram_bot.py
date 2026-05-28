@@ -41,9 +41,9 @@ from telegram.ext import (
 # ─── تنظیمات ─────────────────────────────────────────────────────────────────
 load_dotenv()
 
-TELEGRAM_TOKEN  = os.getenv("TELEGRAM_TOKEN")
-OPENAI_API_KEY  = os.getenv("OPENAI_API_KEY")
-NEWS_API_KEY    = os.getenv("NEWS_API_KEY")
+TELEGRAM_TOKEN  = os.getenv("TELEGRAM_TOKEN", "").strip()
+OPENAI_API_KEY  = os.getenv("OPENAI_API_KEY", "").strip()
+NEWS_API_KEY    = os.getenv("NEWS_API_KEY", "").strip()
 GROUP_CHAT_ID   = int(os.getenv("GROUP_CHAT_ID", "0"))
 
 logging.basicConfig(
@@ -51,6 +51,23 @@ logging.basicConfig(
     level=logging.INFO,
 )
 logger = logging.getLogger(__name__)
+
+# ─── چک کردن متغیرهای ضروری ──────────────────────────────────────────────────
+missing = []
+if not TELEGRAM_TOKEN:
+    missing.append("TELEGRAM_TOKEN")
+if not OPENAI_API_KEY:
+    missing.append("OPENAI_API_KEY")
+if not NEWS_API_KEY:
+    missing.append("NEWS_API_KEY")
+
+if missing:
+    raise EnvironmentError(
+        f"❌ متغیرهای محیطی زیر تنظیم نشده‌اند: {', '.join(missing)}\n"
+        "لطفاً در Railway → Variables همه را وارد کنید."
+    )
+
+logger.info("✅ همه متغیرهای محیطی بارگذاری شدند.")
 
 ai = AsyncOpenAI(api_key=OPENAI_API_KEY)
 
